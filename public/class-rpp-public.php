@@ -355,4 +355,44 @@ class RPP_Public {
             wp_send_json_error(__('Partner not found or not approved.', 'roanga-partner'));
         }
     }
+    
+    /**
+     * Handle partner login AJAX
+     */
+    public function handle_partner_login() {
+        check_ajax_referer('rpp_public_nonce', 'nonce');
+        
+        $email = sanitize_email($_POST['partner_email']);
+        $password = $_POST['partner_password'];
+        $remember = isset($_POST['remember_me']) && $_POST['remember_me'] == '1';
+        
+        if (empty($email) || empty($password)) {
+            wp_send_json_error(__('Prosím vyplňte všechna pole.', 'roanga-partner'));
+        }
+        
+        $user = wp_authenticate($email, $password);
+        
+        if (is_wp_error($user)) {
+            wp_send_json_error(__('Nesprávný email nebo heslo.', 'roanga-partner'));
+        }
+        
+        // Check if user is a partner
+        $partner_class = new RPP_Partner();
+        $partner = $partner_class->get_partner_by_user($user->ID);
+        
+        if (!$partner) {
+            wp_send_json_error(__('Tento účet není registrován jako partner.', 'roanga-partner'));
+        }
+        
+        // Log user in
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID, $remember);
+        
+        $dashboard_url = get_permalink(get_option('rpp_dashboard_page_id'));
+        
+        wp_send_json_success(array(
+            'message' => __('Přihlášení proběhlo úspěšně!', 'roanga-partner'),
+            'redirect_url' => $dashboard_url ?: home_url()
+        ));
+    }
 }

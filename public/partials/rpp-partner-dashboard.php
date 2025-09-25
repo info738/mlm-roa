@@ -91,7 +91,7 @@ $referral_link = $tracking_class->get_referral_link($partner->partner_code);
         <h4><?php _e('💰 Výplaty', 'roanga-partner'); ?></h4>
         <div id="payouts-content">
             <div style="text-align: center; padding: 20px;">
-                <div class="spinner" style="visibility: visible; float: none; margin: 0 auto;"></div>
+                <div class="spinner is-active" style="float: none; margin: 0 auto;"></div>
                 <p><?php _e('Načítám data o výplatách...', 'roanga-partner'); ?></p>
             </div>
         </div>
@@ -175,7 +175,7 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function() {
-                $('#payouts-content').html('<div class="rpp-message rpp-error">Chyba při načítání: Neznámá chyba</div>');
+                $('#payouts-content').html('<div class="rpp-message rpp-error"><?php _e("Chyba při načítání dat o výplatách. Zkuste obnovit stránku.", "roanga-partner"); ?></div>');
             }
         });
     }
@@ -188,9 +188,9 @@ jQuery(document).ready(function($) {
         html += '<div class="rpp-balance-card">';
         html += '<div class="rpp-balance-icon">💰</div>';
         html += '<div class="rpp-balance-info">';
-        html += '<h3>K dispozici k výplatě</h3>';
+        html += '<h3><?php _e("K dispozici k výplatě", "roanga-partner"); ?></h3>';
         html += '<div class="rpp-balance-amount">' + formatPrice(data.stats.available_balance) + '</div>';
-        html += '<div class="rpp-progress-info">Minimální výplata: ' + formatPrice(data.minimum_payout) + '</div>';
+        html += '<div class="rpp-progress-info"><?php _e("Minimální výplata:", "roanga-partner"); ?> ' + formatPrice(data.minimum_payout) + '</div>';
         html += '</div>';
         html += '</div>';
         html += '</div>';
@@ -198,7 +198,7 @@ jQuery(document).ready(function($) {
         // Bank info
         if (data.bank_account) {
             html += '<div class="rpp-bank-info">';
-            html += '<strong>Bankovní účet:</strong> ' + data.bank_account;
+            html += '<strong><?php _e("Bankovní účet:", "roanga-partner"); ?></strong> ' + data.bank_account;
             if (data.bank_name) {
                 html += '<div class="rpp-bank-name">' + data.bank_name + '</div>';
             }
@@ -208,53 +208,53 @@ jQuery(document).ready(function($) {
         // Payout request form
         if (data.stats.available_balance >= data.minimum_payout) {
             html += '<div class="rpp-payout-section">';
-            html += '<h4>Požádat o výplatu</h4>';
+            html += '<h4><?php _e("Požádat o výplatu", "roanga-partner"); ?></h4>';
             html += '<form id="rpp-payout-request-form" class="rpp-modern-form">';
             html += '<div class="rpp-form-row">';
             html += '<div class="rpp-form-group">';
-            html += '<label class="rpp-form-label">Částka k výplatě</label>';
+            html += '<label class="rpp-form-label"><?php _e("Částka k výplatě", "roanga-partner"); ?></label>';
             html += '<div class="rpp-input-group">';
             html += '<input type="number" name="amount" class="rpp-form-input" min="' + data.minimum_payout + '" max="' + data.stats.available_balance + '" step="0.01" required>';
             html += '<span class="rpp-input-suffix">Kč</span>';
             html += '</div>';
-            html += '<div class="rpp-form-help">Dostupné: ' + formatPrice(data.stats.available_balance) + '</div>';
+            html += '<div class="rpp-form-help"><?php _e("Dostupné:", "roanga-partner"); ?> ' + formatPrice(data.stats.available_balance) + '</div>';
             html += '</div>';
             html += '</div>';
             
             html += '<div class="rpp-form-group">';
-            html += '<label class="rpp-form-label">Faktura (volitelné)</label>';
+            html += '<label class="rpp-form-label"><?php _e("Faktura (volitelné)", "roanga-partner"); ?></label>';
             html += '<div class="rpp-file-upload-area">';
             html += '<input type="file" name="invoice" class="rpp-file-input" accept=".pdf,.jpg,.jpeg,.png">';
             html += '<div class="rpp-file-upload-text">';
             html += '<div class="rpp-file-icon">📄</div>';
-            html += '<div>Klikněte pro nahrání faktury</div>';
-            html += '<small>PDF, JPG, PNG (max 5MB)</small>';
+            html += '<div><?php _e("Klikněte pro nahrání faktury", "roanga-partner"); ?></div>';
+            html += '<small><?php _e("PDF, JPG, PNG (max 5MB)", "roanga-partner"); ?></small>';
             html += '</div>';
             html += '</div>';
             html += '</div>';
             
             html += '<div class="rpp-form-group">';
-            html += '<label class="rpp-form-label">Poznámky</label>';
-            html += '<textarea name="notes" class="rpp-form-textarea" placeholder="Volitelné poznámky k výplatě"></textarea>';
+            html += '<label class="rpp-form-label"><?php _e("Poznámky", "roanga-partner"); ?></label>';
+            html += '<textarea name="notes" class="rpp-form-textarea" placeholder="<?php _e("Volitelné poznámky k výplatě", "roanga-partner"); ?>"></textarea>';
             html += '</div>';
             
             html += '<div class="rpp-form-actions">';
             html += '<button type="submit" class="rpp-submit-btn">';
             html += '<span class="rpp-btn-icon">💸</span>';
-            html += 'Požádat o výplatu';
+            html += '<?php _e("Požádat o výplatu", "roanga-partner"); ?>';
             html += '</button>';
             html += '</div>';
             html += '</form>';
             html += '</div>';
         } else {
             html += '<div class="rpp-notice rpp-warning">';
-            html += 'Pro výplatu potřebujete minimálně ' + formatPrice(data.minimum_payout) + '. Aktuálně máte k dispozici ' + formatPrice(data.stats.available_balance) + '.';
+            html += '<?php _e("Pro výplatu potřebujete minimálně", "roanga-partner"); ?> ' + formatPrice(data.minimum_payout) + '. <?php _e("Aktuálně máte k dispozici", "roanga-partner"); ?> ' + formatPrice(data.stats.available_balance) + '.';
             html += '</div>';
         }
         
         // Payout history
         html += '<div class="rpp-payout-section">';
-        html += '<h4>Historie výplat</h4>';
+        html += '<h4><?php _e("Historie výplat", "roanga-partner"); ?></h4>';
         
         if (data.payouts && data.payouts.length > 0) {
             html += '<div class="rpp-payout-timeline">';
@@ -282,14 +282,14 @@ jQuery(document).ready(function($) {
                     html += '<div class="rpp-timeline-invoice">';
                     html += '<a href="' + payout.invoice_url + '" target="_blank" class="rpp-invoice-btn">';
                     html += '<span class="rpp-invoice-icon">📄</span>';
-                    html += 'Stáhnout fakturu';
+                    html += '<?php _e("Stáhnout fakturu", "roanga-partner"); ?>';
                     html += '</a>';
                     html += '</div>';
                 }
                 
                 if (payout.notes) {
                     html += '<div class="rpp-timeline-notes">';
-                    html += '<div class="rpp-notes-label">Poznámky:</div>';
+                    html += '<div class="rpp-notes-label"><?php _e("Poznámky:", "roanga-partner"); ?></div>';
                     html += '<div class="rpp-notes-text">' + payout.notes + '</div>';
                     html += '</div>';
                 }
@@ -301,8 +301,8 @@ jQuery(document).ready(function($) {
         } else {
             html += '<div class="rpp-empty-state-card">';
             html += '<div class="rpp-empty-icon">💸</div>';
-            html += '<h4>Žádné výplaty</h4>';
-            html += '<p>Zatím jste nepožádali o žádnou výplatu.</p>';
+            html += '<h4><?php _e("Žádné výplaty", "roanga-partner"); ?></h4>';
+            html += '<p><?php _e("Zatím jste nepožádali o žádnou výplatu.", "roanga-partner"); ?></p>';
             html += '</div>';
         }
         
@@ -322,7 +322,7 @@ jQuery(document).ready(function($) {
         var $button = $form.find('button[type="submit"]');
         var originalText = $button.html();
         
-        $button.prop('disabled', true).html('<span class="spinner" style="visibility: visible; float: none; margin-right: 8px;"></span>Odesílám...');
+        $button.prop('disabled', true).html('<span class="spinner is-active" style="float: none; margin-right: 8px;"></span><?php _e("Odesílám...", "roanga-partner"); ?>');
         
         var formData = new FormData(form);
         formData.append('action', 'rpp_payout_request');
@@ -336,14 +336,14 @@ jQuery(document).ready(function($) {
             contentType: false,
             success: function(response) {
                 if (response.success) {
-                    alert('Žádost o výplatu byla úspěšně odeslána!');
+                    alert('<?php _e("Žádost o výplatu byla úspěšně odeslána!", "roanga-partner"); ?>');
                     loadPayoutData(); // Reload data
                 } else {
-                    alert('Chyba: ' + response.data);
+                    alert('<?php _e("Chyba:", "roanga-partner"); ?> ' + response.data);
                 }
             },
             error: function() {
-                alert('Došlo k chybě při odesílání žádosti.');
+                alert('<?php _e("Došlo k chybě při odesílání žádosti.", "roanga-partner"); ?>');
             },
             complete: function() {
                 $button.prop('disabled', false).html(originalText);
@@ -384,10 +384,10 @@ jQuery(document).ready(function($) {
     
     function getStatusText(status) {
         switch(status) {
-            case 'requested': return 'Čeká na schválení';
-            case 'approved': return 'Schváleno';
-            case 'completed': return 'Vyplaceno';
-            case 'rejected': return 'Zamítnuto';
+            case 'requested': return '<?php _e("Čeká na schválení", "roanga-partner"); ?>';
+            case 'approved': return '<?php _e("Schváleno", "roanga-partner"); ?>';
+            case 'completed': return '<?php _e("Vyplaceno", "roanga-partner"); ?>';
+            case 'rejected': return '<?php _e("Zamítnuto", "roanga-partner"); ?>';
             default: return status;
         }
     }

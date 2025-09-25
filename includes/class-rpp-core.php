@@ -94,6 +94,8 @@ class RPP_Core {
         $this->loader->add_action('wp_ajax_rpp_get_payout_data', $plugin_public, 'get_payout_data');
         $this->loader->add_action('wp_ajax_rpp_search_partner', $plugin_public, 'search_partner');
         $this->loader->add_action('wp_ajax_nopriv_rpp_search_partner', $plugin_public, 'search_partner');
+        $this->loader->add_action('wp_ajax_rpp_partner_login', $plugin_public, 'handle_partner_login');
+        $this->loader->add_action('wp_ajax_nopriv_rpp_partner_login', $plugin_public, 'handle_partner_login');
         
         // Initialize WooCommerce integration if WooCommerce is active
         $this->loader->add_action('plugins_loaded', $this, 'init_woocommerce_integration');
