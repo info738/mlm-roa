@@ -220,20 +220,129 @@ class RPP_Public {
     }
     
     /**
-     * Handle payout request AJAX
+     * Handle partner login AJAX
      */
-    public function handle_payout_request() {
+    public function handle_partner_login() {
+        check_ajax_referer('rpp_public_nonce', 'nonce');
+        
+        $email = sanitize_email($_POST['partner_email']);
+        $password = $_POST['partner_password'];
+        $remember = isset($_POST['remember_me']) && $_POST['remember_me'] == '1';
+        
+        if (empty($email) || empty($password)) {
+            wp_send_json_error(__('Prosím vyplňte všechna pole.', 'roanga-partner'));
+        }
+        
+        $user = wp_authenticate($email, $password);
+        
+        if (is_wp_error($user)) {
+            wp_send_json_error(__('Nesprávný email nebo heslo.', 'roanga-partner'));
+        }
+        
+        // Check if user is a partner
+        $partner_class = new RPP_Partner();
+        $partner = $partner_class->get_partner_by_user($user->ID);
+        
+        if (!$partner) {
+            wp_send_json_error(__('Tento účet není registrován jako partner.', 'roanga-partner'));
+        }
+        
+        // Log user in
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID, $remember);
+        
+        $dashboard_url = get_permalink(get_option('rpp_dashboard_page_id'));
+        
+        wp_send_json_success(array(
+            'message' => __('Přihlášení proběhlo úspěšně!', 'roanga-partner'),
+            'redirect_url' => $dashboard_url ?: home_url()
+        ));
+    }
+    
+    /**
+     * Search partner by code AJAX
+     */
+    public function search_partner() {
+        check_ajax_referer('rpp_public_nonce', 'nonce');
+        
+        $partner_code = sanitize_text_field($_POST['partner_code']);
+        
+        if (empty($partner_code)) {
+            wp_send_json_error(__('Please enter a partner code.', 'roanga-partner'));
+        }
+        
+        $partner_class = new RPP_Partner();
+        $partner = $partner_class->get_partner_by_code($partner_code);
+        
+        if ($partner && $partner->status === 'approved') {
+            wp_send_json_success(array(
+                'name' => $partner->display_name,
+                'code' => $partner->partner_code
+            ));
+        } else {
+            wp_send_json_error(__('Partner not found or not approved.', 'roanga-partner'));
+        }
+    }
+    
+    /**
+     * Get payout data AJAX - NOVÁ METODA
+     */
+    public function get_payout_data() {
         check_ajax_referer('rpp_public_nonce', 'nonce');
         
         if (!is_user_logged_in()) {
-            wp_send_json_error(__('You must be logged in to request a payout.', 'roanga-partner'));
+            wp_send_json_error(__('Musíte být přihlášeni.', 'roanga-partner'));
         }
         
         $partner_class = new RPP_Partner();
         $partner = $partner_class->get_partner_by_user(get_current_user_id());
         
         if (!$partner || $partner->status !== 'approved') {
-            wp_send_json_error(__('You are not an approved partner.', 'roanga-partner'));
+            wp_send_json_error(__('Nejste schváleným partnerem.', 'roanga-partner'));
+        }
+        
+        // Get partner stats
+        $stats = $partner_class->get_partner_stats($partner->id);
+        
+        // Get payout history
+        global $wpdb;
+        $payouts = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}rpp_payouts 
+                 WHERE partner_id = %d 
+                 ORDER BY created_at DESC",
+                $partner->id
+            )
+        );
+        
+        // Get bank info
+        $bank_account = get_user_meta(get_current_user_id(), 'rpp_bank_account', true);
+        $bank_name = get_user_meta(get_current_user_id(), 'rpp_bank_name', true);
+        
+        wp_send_json_success(array(
+            'stats' => $stats,
+            'payouts' => $payouts,
+            'bank_account' => $bank_account,
+            'bank_name' => $bank_name,
+            'minimum_payout' => get_option('rpp_minimum_payout', 50)
+        ));
+    }
+    
+    /**
+     * Handle payout request AJAX - NOVÁ METODA
+     */
+    public function handle_payout_request() {
+        check_ajax_referer('rpp_public_nonce', 'nonce');
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error(__('Musíte být přihlášeni.', 'roanga-partner'));
+        }
+        
+        $partner_class = new RPP_Partner();
+        $partner = $partner_class->get_partner_by_user(get_current_user_id());
+        
+        if (!$partner || $partner->status !== 'approved') {
+            wp_send_json_error(__('Nejste schváleným partnerem.', 'roanga-partner'));
         }
         
         $amount = floatval($_POST['amount']);
@@ -285,114 +394,5 @@ class RPP_Public {
         } else {
             wp_send_json_error(__('Failed to submit payout request. Please try again.', 'roanga-partner'));
         }
-    }
-    
-    /**
-     * Get payout data AJAX
-     */
-    public function get_payout_data() {
-        check_ajax_referer('rpp_public_nonce', 'nonce');
-        
-        if (!is_user_logged_in()) {
-            wp_send_json_error(__('You must be logged in.', 'roanga-partner'));
-        }
-        
-        $partner_class = new RPP_Partner();
-        $partner = $partner_class->get_partner_by_user(get_current_user_id());
-        
-        if (!$partner || $partner->status !== 'approved') {
-            wp_send_json_error(__('You are not an approved partner.', 'roanga-partner'));
-        }
-        
-        // Get partner stats
-        $stats = $partner_class->get_partner_stats($partner->id);
-        
-        // Get payout history
-        global $wpdb;
-        $payouts = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}rpp_payouts 
-                 WHERE partner_id = %d 
-                 ORDER BY created_at DESC",
-                $partner->id
-            )
-        );
-        
-        // Get bank info
-        $bank_account = get_user_meta(get_current_user_id(), 'rpp_bank_account', true);
-        $bank_name = get_user_meta(get_current_user_id(), 'rpp_bank_name', true);
-        
-        wp_send_json_success(array(
-            'stats' => $stats,
-            'payouts' => $payouts,
-            'bank_account' => $bank_account,
-            'bank_name' => $bank_name,
-            'minimum_payout' => get_option('rpp_minimum_payout', 50)
-        ));
-    }
-    
-    /**
-     * Search partner by code AJAX
-     */
-    public function search_partner() {
-        check_ajax_referer('rpp_public_nonce', 'nonce');
-        
-        $partner_code = sanitize_text_field($_POST['partner_code']);
-        
-        if (empty($partner_code)) {
-            wp_send_json_error(__('Please enter a partner code.', 'roanga-partner'));
-        }
-        
-        $partner_class = new RPP_Partner();
-        $partner = $partner_class->get_partner_by_code($partner_code);
-        
-        if ($partner && $partner->status === 'approved') {
-            wp_send_json_success(array(
-                'name' => $partner->display_name,
-                'code' => $partner->partner_code
-            ));
-        } else {
-            wp_send_json_error(__('Partner not found or not approved.', 'roanga-partner'));
-        }
-    }
-    
-    /**
-     * Handle partner login AJAX
-     */
-    public function handle_partner_login() {
-        check_ajax_referer('rpp_public_nonce', 'nonce');
-        
-        $email = sanitize_email($_POST['partner_email']);
-        $password = $_POST['partner_password'];
-        $remember = isset($_POST['remember_me']) && $_POST['remember_me'] == '1';
-        
-        if (empty($email) || empty($password)) {
-            wp_send_json_error(__('Prosím vyplňte všechna pole.', 'roanga-partner'));
-        }
-        
-        $user = wp_authenticate($email, $password);
-        
-        if (is_wp_error($user)) {
-            wp_send_json_error(__('Nesprávný email nebo heslo.', 'roanga-partner'));
-        }
-        
-        // Check if user is a partner
-        $partner_class = new RPP_Partner();
-        $partner = $partner_class->get_partner_by_user($user->ID);
-        
-        if (!$partner) {
-            wp_send_json_error(__('Tento účet není registrován jako partner.', 'roanga-partner'));
-        }
-        
-        // Log user in
-        wp_set_current_user($user->ID);
-        wp_set_auth_cookie($user->ID, $remember);
-        
-        $dashboard_url = get_permalink(get_option('rpp_dashboard_page_id'));
-        
-        wp_send_json_success(array(
-            'message' => __('Přihlášení proběhlo úspěšně!', 'roanga-partner'),
-            'redirect_url' => $dashboard_url ?: home_url()
-        ));
     }
 }

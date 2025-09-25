@@ -21,6 +21,72 @@ $recent_commissions = $commission_class->get_partner_commissions($partner->id, n
 
 // Get referral link
 $referral_link = $tracking_class->get_referral_link($partner->partner_code);
+
+// Calculate team volume for specific period - NOVÁ FUNKCE
+function calculate_team_volume_for_period($partner_id, $period) {
+    global $wpdb;
+    
+    // Calculate period start date
+    $period_start = '';
+    switch ($period) {
+        case 'weekly':
+            $period_start = date('Y-m-d', strtotime('monday this week'));
+            break;
+        case 'monthly':
+            $period_start = date('Y-m-01');
+            break;
+        case 'quarterly':
+            $current_quarter = ceil(date('n') / 3);
+            $quarter_start_month = ($current_quarter - 1) * 3 + 1;
+            $period_start = date('Y-' . sprintf('%02d', $quarter_start_month) . '-01');
+            break;
+        case 'semi-annually':
+            $current_month = date('n');
+            $half_start_month = $current_month <= 6 ? 1 : 7;
+            $period_start = date('Y-' . sprintf('%02d', $half_start_month) . '-01');
+            break;
+        case 'annually':
+            $period_start = date('Y-01-01');
+            break;
+        default:
+            $period_start = date('Y-m-01');
+    }
+    
+    // Get MLM structure to find team members
+    $mlm_class = new RPP_MLM_Structure();
+    $team_members = $mlm_class->get_partner_downline($partner_id);
+    
+    if (empty($team_members)) {
+        return 0;
+    }
+    
+    // Get partner IDs including the main partner
+    $partner_ids = array($partner_id);
+    foreach ($team_members as $member) {
+        $partner_ids[] = $member->partner_id;
+    }
+    
+    $partner_ids_str = implode(',', array_map('intval', $partner_ids));
+    
+    // Calculate total volume from commissions in the period
+    $total_volume = $wpdb->get_var(
+        $wpdb->prepare("
+            SELECT COALESCE(SUM(
+                CASE 
+                    WHEN c.type = 'sale' AND o.ID IS NOT NULL THEN o.total
+                    ELSE c.amount * 10
+                END
+            ), 0)
+            FROM {$wpdb->prefix}rpp_commissions c
+            LEFT JOIN {$wpdb->posts} o ON c.order_id = o.ID AND o.post_type = 'shop_order'
+            WHERE c.partner_id IN ($partner_ids_str) 
+            AND c.status IN ('approved', 'paid')
+            AND DATE(c.created_at) >= %s
+        ", $period_start)
+    );
+    
+    return floatval($total_volume);
+}
 ?>
 
 <div class="rpp-partner-dashboard">
@@ -33,17 +99,17 @@ $referral_link = $tracking_class->get_referral_link($partner->partner_code);
     <div class="rpp-stats-grid">
         <div class="rpp-stat-card">
             <h4><?php _e('Celkové výdělky', 'roanga-partner'); ?></h4>
-            <div class="rpp-stat-value" data-stat="total_earnings"><?php echo wc_price($stats['total_earnings']); ?></div>
-        </div>
-        
-        <div class="rpp-stat-card">
-            <h4><?php _e('K dispozici k výplatě', 'roanga-partner'); ?></h4>
-            <div class="rpp-stat-value" data-stat="available_balance"><?php echo wc_price($stats['available_balance']); ?></div>
+            <div class="rpp-stat-value" data-stat="total_earnings"><?php echo wc_price($stats['total_commissions'] ?? 0); ?></div>
         </div>
         
         <div class="rpp-stat-card">
             <h4><?php _e('Vyplaceno celkem', 'roanga-partner'); ?></h4>
-            <div class="rpp-stat-value" data-stat="total_payouts"><?php echo wc_price($stats['total_payouts']); ?></div>
+            <div class="rpp-stat-value" data-stat="total_payouts"><?php echo wc_price($stats['total_payouts'] ?? 0); ?></div>
+        </div>
+        
+        <div class="rpp-stat-card">
+            <h4><?php _e('K dispozici k výplatě', 'roanga-partner'); ?></h4>
+            <div class="rpp-stat-value" data-stat="available_balance"><?php echo wc_price($stats['available_balance'] ?? 0); ?></div>
         </div>
         
         <div class="rpp-stat-card">
@@ -86,7 +152,7 @@ $referral_link = $tracking_class->get_referral_link($partner->partner_code);
         </div>
     </div>
     
-    <!-- Payouts Section -->
+    <!-- Payouts Section - OPRAVENÁ SEKCE -->
     <div class="rpp-section" id="payouts-section">
         <h4><?php _e('💰 Výplaty', 'roanga-partner'); ?></h4>
         <div id="payouts-content">
@@ -156,7 +222,7 @@ $referral_link = $tracking_class->get_referral_link($partner->partner_code);
 
 <script>
 jQuery(document).ready(function($) {
-    // Load payout data
+    // Load payout data - OPRAVENÁ FUNKCE
     loadPayoutData();
     
     function loadPayoutData() {

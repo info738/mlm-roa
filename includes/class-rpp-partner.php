@@ -166,22 +166,6 @@ class RPP_Partner {
             )
         ) ?: 0;
         
-        // Get approved but not paid commissions
-        $stats['approved_commissions'] = (float) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_commissions WHERE partner_id = %d AND status = 'approved'",
-                $partner_id
-            )
-        ) ?: 0;
-        
-        // Get pending commissions (not yet approved)
-        $stats['pending_commissions'] = (float) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_commissions WHERE partner_id = %d AND status = 'pending'",
-                $partner_id
-            )
-        ) ?: 0;
-        
         // Calculate available balance (total earnings - total payouts)
         $stats['available_balance'] = $stats['total_earnings'] - $stats['total_payouts'];
         
@@ -201,16 +185,6 @@ class RPP_Partner {
         // For backward compatibility
         $stats['total_commissions'] = $stats['total_earnings'];
         $stats['paid_commissions'] = $stats['total_payouts'];
-        
-        error_log('RPP Partner Stats Results:');
-        error_log('- Total earnings: ' . $stats['total_earnings']);
-        error_log('- Total payouts: ' . $stats['total_payouts']);
-        error_log('- Available balance: ' . $stats['available_balance']);
-        error_log('- Approved commissions: ' . $stats['approved_commissions']);
-        error_log('- Pending commissions: ' . $stats['pending_commissions']);
-        error_log('- Total clicks: ' . $stats['total_clicks']);
-        error_log('- Total conversions: ' . $stats['total_conversions']);
-        error_log('- Conversion rate: ' . $stats['conversion_rate'] . '%');
         
         return $stats;
     }

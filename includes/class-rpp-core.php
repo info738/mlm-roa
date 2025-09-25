@@ -90,8 +90,8 @@ class RPP_Core {
         // AJAX handlers for public
         $this->loader->add_action('wp_ajax_rpp_partner_registration', $plugin_public, 'handle_partner_registration');
         $this->loader->add_action('wp_ajax_nopriv_rpp_partner_registration', $plugin_public, 'handle_partner_registration');
-        $this->loader->add_action('wp_ajax_rpp_payout_request', $plugin_public, 'handle_payout_request');
         $this->loader->add_action('wp_ajax_rpp_get_payout_data', $plugin_public, 'get_payout_data');
+        $this->loader->add_action('wp_ajax_rpp_payout_request', $plugin_public, 'handle_payout_request');
         $this->loader->add_action('wp_ajax_rpp_search_partner', $plugin_public, 'search_partner');
         $this->loader->add_action('wp_ajax_nopriv_rpp_search_partner', $plugin_public, 'search_partner');
         $this->loader->add_action('wp_ajax_rpp_partner_login', $plugin_public, 'handle_partner_login');
