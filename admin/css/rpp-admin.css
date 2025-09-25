@@ -1,0 +1,384 @@
+/* Partner Program Admin Styles */
+.rpp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.rpp-stat-box {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rpp-stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.rpp-stat-box h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.rpp-stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2271b1;
+    margin-bottom: 5px;
+}
+
+.rpp-stat-detail {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-pending { 
+    background: #fef2c0; 
+    color: #8a6914; 
+}
+
+.status-approved { 
+    background: #c8e6c9; 
+    color: #2e7d32; 
+}
+
+.status-rejected { 
+    background: #ffcdd2; 
+    color: #c62828; 
+}
+
+.status-paid { 
+    background: #c8e6c9; 
+    color: #2e7d32; 
+}
+
+/* Action Buttons */
+.approve-partner,
+.reject-partner,
+.approve-commission,
+.pay-commission {
+    margin-right: 5px;
+}
+
+.approve-partner,
+.approve-commission {
+    background: #46b450;
+    border-color: #46b450;
+    color: white;
+}
+
+.approve-partner:hover,
+.approve-commission:hover {
+    background: #3ba243;
+    border-color: #3ba243;
+}
+
+.reject-partner {
+    background: #dc3232;
+    border-color: #dc3232;
+    color: white;
+}
+
+.reject-partner:hover {
+    background: #c62d2d;
+    border-color: #c62d2d;
+}
+
+.pay-commission {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: white;
+}
+
+.pay-commission:hover {
+    background: #005a87;
+    border-color: #005a87;
+}
+
+/* Table Enhancements */
+.wp-list-table th {
+    background: #f9f9f9;
+}
+
+.wp-list-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+/* Loading States */
+.button.loading {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.button.loading::after {
+    content: '...';
+}
+
+/* Dashboard Widgets */
+.rpp-dashboard-widget {
+    background: white;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.rpp-dashboard-widget h3 {
+    margin: 0 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.rpp-recent-activities {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.rpp-recent-activities li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rpp-recent-activities li:last-child {
+    border-bottom: none;
+}
+
+.rpp-activity-text {
+    flex: 1;
+}
+
+.rpp-activity-time {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Form Styling */
+.rpp-form-section {
+    background: white;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.rpp-form-section h3 {
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Charts and Graphs */
+.rpp-chart-container {
+    position: relative;
+    height: 300px;
+    margin: 20px 0;
+    background: white;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+/* Responsive Admin */
+@media (max-width: 768px) {
+    .rpp-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .wp-list-table {
+        font-size: 12px;
+    }
+    
+    .wp-list-table th,
+    .wp-list-table td {
+        padding: 8px 6px;
+    }
+    
+    .button.button-small {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+}
+
+/* Bulk Actions */
+.rpp-bulk-actions {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.rpp-bulk-actions select,
+.rpp-bulk-actions input {
+    margin-right: 10px;
+}
+
+/* Notification Styles */
+.rpp-notice {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.rpp-notice.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.rpp-notice.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.rpp-notice.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Settings Page */
+.rpp-settings-section {
+    background: white;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.rpp-settings-section h3 {
+    margin: 0 0 15px;
+    color: #2271b1;
+    font-size: 18px;
+}
+
+.form-table th {
+    width: 200px;
+    vertical-align: top;
+    padding-top: 15px;
+}
+
+.form-table td {
+    padding: 10px 10px 10px 0;
+}
+
+.form-table input[type="text"],
+.form-table input[type="number"],
+.form-table input[type="email"],
+.form-table select {
+    width: 300px;
+    max-width: 100%;
+}
+
+.form-table textarea {
+    width: 400px;
+    max-width: 100%;
+    height: 100px;
+}
+
+/* Tooltips */
+.rpp-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.rpp-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+.rpp-tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Progress Bars */
+.rpp-progress {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.rpp-progress-bar {
+    background: linear-gradient(90deg, #2271b1, #4f94d4);
+    height: 100%;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Data Export */
+.rpp-export-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.rpp-export-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rpp-export-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.rpp-export-button:hover {
+    background: #218838;
+    color: white;
+}
