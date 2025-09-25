@@ -68,6 +68,10 @@ class RPP_Core {
         $this->loader->add_action('wp_ajax_rpp_approve_payout_request', $plugin_admin, 'approve_payout_request');
         $this->loader->add_action('wp_ajax_rpp_reject_payout_request', $plugin_admin, 'reject_payout_request');
         
+        // Public payout AJAX handlers
+        $this->loader->add_action('wp_ajax_rpp_get_payout_data', $plugin_public, 'get_payout_data');
+        $this->loader->add_action('wp_ajax_rpp_payout_request', $plugin_public, 'handle_payout_request');
+        
         // WooCommerce order management AJAX handlers
         $this->loader->add_action('wp_ajax_rpp_assign_partner_to_order', $plugin_admin, 'assign_partner_to_order');
         $this->loader->add_action('wp_ajax_rpp_remove_partner_from_order', $plugin_admin, 'remove_partner_from_order');

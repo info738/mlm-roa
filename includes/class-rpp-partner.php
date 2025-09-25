@@ -185,6 +185,17 @@ class RPP_Partner {
             )
         ) ?: 0;
         
+        // Get total payouts from rpp_payouts table (completed only)
+        $stats['total_payouts'] = (float) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_payouts WHERE partner_id = %d AND status IN ('completed', 'approved')",
+                $partner_id
+            )
+        ) ?: 0;
+        
+        // Calculate available balance (total earnings - total payouts)
+        $stats['available_balance'] = $stats['total_earnings'] - $stats['total_payouts'];
+        
         // Get conversions count
         $stats['total_conversions'] = (int) $wpdb->get_var(
             $wpdb->prepare(
