@@ -161,13 +161,10 @@ class RPP_Partner {
         // Get total payouts from rpp_payouts table (completed only)
         $stats['total_payouts'] = (float) $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_payouts WHERE partner_id = %d AND status = 'completed'",
+                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_payouts WHERE partner_id = %d AND status IN ('completed', 'approved')",
                 $partner_id
             )
         ) ?: 0;
-        
-        // Calculate available balance (total earnings - total payouts)
-        $stats['available_balance'] = $stats['total_earnings'] - $stats['total_payouts'];
         
         // Get approved but not paid commissions
         $stats['approved_commissions'] = (float) $wpdb->get_var(
@@ -181,14 +178,6 @@ class RPP_Partner {
         $stats['pending_commissions'] = (float) $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_commissions WHERE partner_id = %d AND status = 'pending'",
-                $partner_id
-            )
-        ) ?: 0;
-        
-        // Get total payouts from rpp_payouts table (completed only)
-        $stats['total_payouts'] = (float) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COALESCE(SUM(amount), 0) FROM {$wpdb->prefix}rpp_payouts WHERE partner_id = %d AND status IN ('completed', 'approved')",
                 $partner_id
             )
         ) ?: 0;
